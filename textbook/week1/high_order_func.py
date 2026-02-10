@@ -10,35 +10,10 @@ def hello():
 # call_func(3,hello)
 
 
-def approx_eq(x, y, tolerance=1e-15):
-    return abs(x - y) < tolerance
 
 
-def improve(update, close, guess=1):
-    iterations = 0
-    while not close(guess):
-        guess = update(guess)
-        iterations += 1
-        if iterations > 1100:
-            break
-    return guess
 
 
-def newton_update(f, df):
-    def update(x):
-        return x - f(x) / df(x)
-
-    return update
-
-
-def find_root(f, df, guess=1):
-    def near_zero(x):
-        return approx_eq(f(x), 0)
-
-    return improve(newton_update(f, df), near_zero, guess)
-
-
-# print(find_root(lambda x: x**2 - 4, lambda x: 2*x,2))
 
 
 def curried_pow(x):
