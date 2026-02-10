@@ -1,8 +1,10 @@
 """CS 61A presents Ants Vs. SomeBees."""
 
 import random
-from ucb import main, interact, trace
 from collections import OrderedDict
+from tkinter import NONE
+
+from ucb import interact, main, trace
 
 ################
 # Core Classes #
@@ -28,6 +30,8 @@ class Place:
         # Phase 1: Add an entrance to the exit
         # BEGIN Problem 2
         "*** YOUR CODE HERE ***"
+        if exit is not None:
+            exit.entrance = self
         # END Problem 2
 
     def add_insect(self, insect):
@@ -144,6 +148,7 @@ class HarvesterAnt(Ant):
     name = "Harvester"
     implemented = True
     # OVERRIDE CLASS ATTRIBUTES HERE
+    food_cost = 2
 
     def action(self, gamestate):
         """Produce 1 additional food for the colony.
@@ -152,6 +157,7 @@ class HarvesterAnt(Ant):
         """
         # BEGIN Problem 1
         "*** YOUR CODE HERE ***"
+        gamestate.food += 1
         # END Problem 1
 
 
@@ -162,6 +168,9 @@ class ThrowerAnt(Ant):
     implemented = True
     damage = 1
     # ADD/OVERRIDE CLASS ATTRIBUTES HERE
+    food_cost = 3
+    upper_bound = float("inf")
+    lower_bound = -1
 
     def nearest_bee(self):
         """Return the nearest Bee in a Place (that is not the hive) connected to
@@ -170,7 +179,15 @@ class ThrowerAnt(Ant):
         This method returns None if there is no such Bee (or none in range).
         """
         # BEGIN Problem 3 and 4
-        return random_bee(self.place.bees)  # REPLACE THIS LINE
+        bee_tile = self.place
+        distance = 0
+        while bee_tile is not None and not bee_tile.is_hive:
+            if distance >= self.lower_bound and distance <= self.upper_bound:
+                if bee_tile.bees:
+                    return random_bee(bee_tile.bees)
+            bee_tile = bee_tile.entrance
+            distance += 1
+        return None
         # END Problem 3 and 4
 
     def throw_at(self, target):
@@ -204,7 +221,8 @@ class ShortThrower(ThrowerAnt):
     food_cost = 2
     # OVERRIDE CLASS ATTRIBUTES HERE
     # BEGIN Problem 4
-    implemented = False  # Change to True to view in the GUI
+    implemented = True  # Change to True to view in the GUI
+    upper_bound = 3
     # END Problem 4
 
 
@@ -215,7 +233,8 @@ class LongThrower(ThrowerAnt):
     food_cost = 2
     # OVERRIDE CLASS ATTRIBUTES HERE
     # BEGIN Problem 4
-    implemented = False  # Change to True to view in the GUI
+    implemented = True  # Change to True to view in the GUI
+    lower_bound = 5
     # END Problem 4
 
 
