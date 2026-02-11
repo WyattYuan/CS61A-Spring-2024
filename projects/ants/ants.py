@@ -4,6 +4,8 @@ import random
 from collections import OrderedDict
 from tkinter import NONE
 
+from typing_extensions import NoReturn
+
 from ucb import interact, main, trace
 
 ################
@@ -122,7 +124,14 @@ class Ant(Insect):
             place.ant = self
         else:
             # BEGIN Problem 8b
-            assert place.ant is None, "Too many ants in {0}".format(place)
+            if place.ant.can_contain(self):
+                place.ant.store_ant(self)
+            elif self.can_contain(place.ant):
+                ant = place.ant
+                place.ant = self
+                self.store_ant(ant)
+            else:
+                assert place.ant is None, "Too many ants in {0}".format(place)
             # END Problem 8b
         Insect.add_to(self, place)
 
@@ -331,11 +340,13 @@ class ContainerAnt(Ant):
     def can_contain(self, other):
         # BEGIN Problem 8a
         "*** YOUR CODE HERE ***"
+        return not self.ant_contained and not other.is_container
         # END Problem 8a
 
     def store_ant(self, ant):
         # BEGIN Problem 8a
         "*** YOUR CODE HERE ***"
+        self.ant_contained = ant
         # END Problem 8a
 
     def remove_ant(self, ant):
@@ -356,6 +367,8 @@ class ContainerAnt(Ant):
     def action(self, gamestate):
         # BEGIN Problem 8a
         "*** YOUR CODE HERE ***"
+        if self.ant_contained:
+            self.ant_contained.action(gamestate)
         # END Problem 8a
 
 
@@ -366,7 +379,11 @@ class BodyguardAnt(ContainerAnt):
     food_cost = 4
     # OVERRIDE CLASS ATTRIBUTES HERE
     # BEGIN Problem 8c
-    implemented = False  # Change to True to view in the GUI
+    implemented = True  # Change to True to view in the GUI
+
+    def __init__(self, health=2):
+        super().__init__(health)
+
     # END Problem 8c
 
 
